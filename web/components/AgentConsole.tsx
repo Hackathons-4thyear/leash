@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useAgent, type AgentEvent, type Scenario } from "@/lib/agent";
-import { AGENT_URL } from "@/lib/config";
+import { AGENT_URL, DEMO_VIDEO_URL } from "@/lib/config";
 import { humanReason } from "@/lib/format";
 import { IconBan, IconBolt, IconBot, IconBrain, IconCheck, IconClock, IconCoins, IconReturn, IconShieldAlert, IconTerminal, IconWrench, IconX } from "./icons";
 import { CardHeader, cx, Dot, TxLink } from "./ui";
@@ -87,6 +87,12 @@ export function AgentConsole() {
 function Terminal({ events, online, busy, onClear }: { events: AgentEvent[]; online: boolean | null; busy: boolean; onClear: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const [stick, setStick] = useState(true);
+  // Resolved after mount so server and client render the same markup.
+  const [local, setLocal] = useState(true);
+
+  useEffect(() => {
+    setLocal(["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname));
+  }, []);
 
   useEffect(() => {
     if (stick && ref.current) ref.current.scrollTo({ top: ref.current.scrollHeight, behavior: "smooth" });
@@ -113,7 +119,27 @@ function Terminal({ events, online, busy, onClear }: { events: AgentEvent[]; onl
         }}
         className="min-h-0 flex-1 overflow-y-auto px-4 py-3 font-mono text-xs leading-relaxed scroll-thin"
       >
-        {online === false ? (
+        {online === false && !local ? (
+          <div className="flex h-full flex-col items-center justify-center gap-3 text-center font-sans">
+            <span className="grid size-11 place-items-center rounded-full bg-info/10 text-info ring-1 ring-inset ring-info/25">
+              <IconBot />
+            </span>
+            <p className="max-w-sm text-sm text-fg">
+              The AI agent runs locally during demos. Watch it get prompt-injected and blocked in our demo video.
+            </p>
+            {DEMO_VIDEO_URL && (
+              <a
+                href={DEMO_VIDEO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-lg border border-line bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-fg transition hover:border-info/40 hover:bg-info/[0.08]"
+              >
+                Watch the demo video
+              </a>
+            )}
+            <p className="max-w-sm text-[11px] text-faint">Everything else on this page is live onchain data from Base Sepolia.</p>
+          </div>
+        ) : online === false ? (
           <div className="flex h-full flex-col items-center justify-center gap-3 text-center font-sans">
             <span className="grid size-11 place-items-center rounded-full bg-danger/10 text-danger ring-1 ring-inset ring-danger/25">
               <IconBot />

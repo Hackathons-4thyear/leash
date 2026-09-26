@@ -6,6 +6,7 @@ export { deployment, chain };
 
 export const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || deployment.rpcUrl;
 export const AGENT_URL = (process.env.NEXT_PUBLIC_AGENT_URL || "http://localhost:4022").replace(/\/$/, "");
+export const DEMO_VIDEO_URL = process.env.NEXT_PUBLIC_DEMO_VIDEO_URL?.trim() || undefined;
 
 export const VAULT = deployment.addresses.vault;
 export const ORACLE = deployment.addresses.oracle;

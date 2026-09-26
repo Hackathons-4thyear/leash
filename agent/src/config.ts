@@ -16,7 +16,11 @@ export { deployment };
 export const API_URL = (env("API_URL") || "http://localhost:4021").replace(/\/$/, "");
 export const RPC_URL = env("RPC_URL") || deployment.rpcUrl;
 export const PORT = Number(env("PORT") || 4022);
-export const WEB_ORIGIN = "http://localhost:3000";
+/** Dashboard origins allowed by CORS (comma-separated in WEB_ORIGIN). */
+export const WEB_ORIGIN = (env("WEB_ORIGIN") || "http://localhost:3000")
+  .split(",")
+  .map((o) => o.trim().replace(/\/$/, ""))
+  .filter(Boolean);
 
 /** Read lazily so a missing key only fails when the agent actually tries to pay. */
 export function agentPrivateKey(): Hex {
