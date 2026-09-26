@@ -19,7 +19,7 @@ The contract does the checking, so even a prompt-injected agent can't overspend 
 | [`shared/`](shared/) | Generated deployment addresses + ABIs used by every package (`npm run sync`) |
 | [`api/`](api/) | Paywalled x402-style API settled through the vault. See [api/README.md](api/README.md). |
 | [`agent/`](agent/) | AI agent that buys data from the API and can only pay through the vault (LLM or scripted, plus a prompt-injection simulation). CLI and SSE server. See [agent/README.md](agent/README.md). |
-| [`web/`](web/) | Next.js dashboard (step 4) |
+| [`web/`](web/) | Next.js dashboard: live vault state, activity feed, attack alerts, kill switch, approvals, policy, and an agent console. See [web/README.md](web/README.md). |
 
 ## How to run
 
@@ -51,4 +51,10 @@ npm run agent -- report                   # 8 mUSDC: waits for owner approval, t
 npm run agent -- injection-llm            # LLM reads a prompt-injected response
 npm run agent -- injection-compromised    # SIMULATION: hijacked agent, every payment blocked onchain
 npm run agent:server                      # http://localhost:4022 for the dashboard (POST /run, GET /events)
+
+# Dashboard on http://localhost:3000 (reads the chain; works without a wallet or the agent server)
+npm run web
+npm run web:build                         # production build
 ```
+
+For the full demo, run `npm run api`, `npm run agent:server` and `npm run web` in three terminals. Then open http://localhost:3000 and click **Simulate hijacked agent**. Connect the vault owner wallet in MetaMask to use the kill switch and to approve or deny pending payments. Vercel setup is in [web/README.md](web/README.md#deploy-to-vercel-monorepo).
