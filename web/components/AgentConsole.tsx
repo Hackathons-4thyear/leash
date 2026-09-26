@@ -25,6 +25,13 @@ export function AgentConsole() {
   const { online, status, events, run, starting, notice, clear } = useAgent();
   const busy = Boolean(status?.busy) || starting !== null;
   const llm = status?.llm;
+  // Resolved after mount so server and client render the same markup.
+  const [local, setLocal] = useState(true);
+  const demo = online === false && !local;
+
+  useEffect(() => {
+    setLocal(["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname));
+  }, []);
 
   return (
     <div className="card flex h-[560px] flex-col overflow-hidden lg:h-[640px]">
@@ -32,18 +39,20 @@ export function AgentConsole() {
         icon={<IconBot width={15} height={15} />}
         title="Agent console"
         sub={
-          online === false
-            ? "Agent server offline"
-            : llm
-              ? llm.configured
-                ? `LLM: ${llm.provider} · ${llm.model}`
-                : "No LLM configured · scripted agent"
-              : "Connecting to agent server…"
+          demo
+            ? "AI agent — runs locally"
+            : online === false
+              ? "Agent server offline"
+              : llm
+                ? llm.configured
+                  ? `LLM: ${llm.provider} · ${llm.model}`
+                  : "No LLM configured · scripted agent"
+                : "Connecting to agent server…"
         }
         right={
           <span className="flex items-center gap-2 text-[11px] text-faint">
-            <Dot tone={online ? (busy ? "warn" : "safe") : online === false ? "danger" : "muted"} pulse={online === true} />
-            {online ? (busy ? "Running" : "Idle") : online === false ? "Offline" : "…"}
+            <Dot tone={online ? (busy ? "warn" : "safe") : online === false && !demo ? "danger" : "muted"} pulse={online === true} />
+            {online ? (busy ? "Running" : "Idle") : demo ? "Demo mode" : online === false ? "Offline" : "…"}
           </span>
         }
       />
@@ -79,20 +88,14 @@ export function AgentConsole() {
 
       {notice && <p className="border-b border-warn/20 bg-warn/[0.07] px-4 py-2 text-xs text-warn">{notice}</p>}
 
-      <Terminal events={events} online={online} busy={busy} onClear={clear} />
+      <Terminal events={events} online={online} demo={demo} busy={busy} onClear={clear} />
     </div>
   );
 }
 
-function Terminal({ events, online, busy, onClear }: { events: AgentEvent[]; online: boolean | null; busy: boolean; onClear: () => void }) {
+function Terminal({ events, online, demo, busy, onClear }: { events: AgentEvent[]; online: boolean | null; demo: boolean; busy: boolean; onClear: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const [stick, setStick] = useState(true);
-  // Resolved after mount so server and client render the same markup.
-  const [local, setLocal] = useState(true);
-
-  useEffect(() => {
-    setLocal(["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname));
-  }, []);
 
   useEffect(() => {
     if (stick && ref.current) ref.current.scrollTo({ top: ref.current.scrollHeight, behavior: "smooth" });
@@ -119,7 +122,7 @@ function Terminal({ events, online, busy, onClear }: { events: AgentEvent[]; onl
         }}
         className="min-h-0 flex-1 overflow-y-auto px-4 py-3 font-mono text-xs leading-relaxed scroll-thin"
       >
-        {online === false && !local ? (
+        {demo ? (
           <div className="flex h-full flex-col items-center justify-center gap-3 text-center font-sans">
             <span className="grid size-11 place-items-center rounded-full bg-info/10 text-info ring-1 ring-inset ring-info/25">
               <IconBot />
