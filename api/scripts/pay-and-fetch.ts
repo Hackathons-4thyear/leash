@@ -5,10 +5,18 @@
 
 import "dotenv/config";
 import pc from "picocolors";
-import { createPublicClient, createWalletClient, decodeEventLog, formatUnits, http, isAddressEqual, type Hex } from "viem";
+import { createPublicClient, createWalletClient, formatUnits, http, type Hex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { baseSepolia as chain } from "viem/chains";
-import { baseSepolia as deployment, leashVaultAbi, REASON_CODES, txUrl } from "@leash/shared";
+import {
+  baseSepolia as deployment,
+  decodePaymentResponse,
+  encodePaymentHeader,
+  leashVaultAbi,
+  parseVaultVerdict,
+  REASON_CODES,
+  txUrl,
+} from "@leash/shared";
 
 const API_URL = process.env.API_URL || `http://localhost:${process.env.PORT || 4021}`;
 const RPC_URL = process.env.RPC_URL || deployment.rpcUrl;
@@ -30,13 +38,13 @@ function parseArgs(argv: string[]) {
 
 async function retryWithPayment(n: number, url: string, txHash: Hex, nonce: string) {
   step(n, `Retry with X-PAYMENT`);
-  const header = Buffer.from(JSON.stringify({ txHash, nonce })).toString("base64");
+  const header = encodePaymentHeader(txHash, nonce);
   const res = await fetch(url, { headers: { "X-PAYMENT": header } });
   const body = await res.json();
   const color = res.ok ? pc.green : pc.red;
   kv("status", color(pc.bold(String(res.status))));
   const settlement = res.headers.get("X-PAYMENT-RESPONSE");
-  if (settlement) kv("settled", Buffer.from(settlement, "base64").toString("utf8"));
+  if (settlement) kv("settled", JSON.stringify(decodePaymentResponse(settlement)));
   console.log(color(JSON.stringify(res.ok ? body : { error: body.error }, null, 2).replace(/^/gm, "    ")));
 }
 
@@ -92,34 +100,23 @@ async function main() {
   kv("block", receipt.blockNumber);
 
   step(4, "Vault verdict (from receipt logs)");
-  for (const entry of receipt.logs) {
-    if (!isAddressEqual(entry.address, vault)) continue;
-    let event;
-    try {
-      event = decodeEventLog({ abi: leashVaultAbi, data: entry.data, topics: entry.topics });
-    } catch {
-      continue;
-    }
-    if (event.eventName === "PaymentExecuted") {
-      kv("result", pc.green(pc.bold(`EXECUTED: ${fmt(event.args.amount)} sent to ${event.args.to}`)));
-      return retryWithPayment(5, url, hash, nonce);
-    }
-    if (event.eventName === "PaymentBlocked") {
-      kv("result", pc.red(pc.bold(`BLOCKED: ${event.args.reasonText}`)));
-      kv("note", "No funds moved. The attempt is recorded onchain.");
-      return retryWithPayment(5, url, hash, nonce);
-    }
-    if (event.eventName === "PaymentPending") {
-      const id = event.args.requestId;
-      kv("result", pc.yellow(pc.bold(`PENDING: request #${id} awaits owner approval`)));
-      console.log(`\n${pc.bold("Approve it as the vault owner (from contracts/, after `source .env`):")}`);
-      console.log(`    cast send ${vault} "approveRequest(uint256)" ${id} --private-key $DEPLOYER_PRIVATE_KEY --rpc-url ${deployment.rpcUrl}`);
-      console.log(`\n${pc.bold("Then finish the purchase with the approval tx hash:")}`);
-      console.log(`    npm run demo:report -w @leash/api -- --tx <approvalTxHash> --nonce ${nonce}`);
-      return;
-    }
+  const verdict = parseVaultVerdict(receipt.logs, vault);
+  if (!verdict) throw new Error("No LeashVault payment event found in the receipt");
+  if (verdict.result === "EXECUTED") {
+    kv("result", pc.green(pc.bold(`EXECUTED: ${fmt(verdict.amount)} sent to ${verdict.to}`)));
+    return retryWithPayment(5, url, hash, nonce);
   }
-  throw new Error("No LeashVault payment event found in the receipt");
+  if (verdict.result === "BLOCKED") {
+    kv("result", pc.red(pc.bold(`BLOCKED: ${verdict.reason}`)));
+    kv("note", "No funds moved. The attempt is recorded onchain.");
+    return retryWithPayment(5, url, hash, nonce);
+  }
+  const id = verdict.requestId;
+  kv("result", pc.yellow(pc.bold(`PENDING: request #${id} awaits owner approval`)));
+  console.log(`\n${pc.bold("Approve it as the vault owner (from contracts/, after `source .env`):")}`);
+  console.log(`    cast send ${vault} "approveRequest(uint256)" ${id} --private-key $DEPLOYER_PRIVATE_KEY --rpc-url ${deployment.rpcUrl}`);
+  console.log(`\n${pc.bold("Then finish the purchase with the approval tx hash:")}`);
+  console.log(`    npm run demo:report -w @leash/api -- --tx <approvalTxHash> --nonce ${nonce}`);
 }
 
 main().catch((err) => {

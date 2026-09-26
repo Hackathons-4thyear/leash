@@ -9,7 +9,9 @@
   ],
   "scripts": {
     "sync": "node shared/scripts/sync.mjs",
-    "api": "npm run dev -w @leash/api"
+    "api": "npm run dev -w @leash/api",
+    "agent": "npm run start -w @leash/agent --",
+    "agent:server": "npm run server -w @leash/agent"
   },
   "engines": {
     "node": ">=20"

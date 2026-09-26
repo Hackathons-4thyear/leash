@@ -18,7 +18,7 @@ The contract does the checking, so even a prompt-injected agent can't overspend 
 | [`contracts/`](contracts/) | Foundry project: `LeashVault`, `MockUSDC`, `MockReputationOracle`, tests, deploy script. See [contracts/README.md](contracts/README.md). |
 | [`shared/`](shared/) | Generated deployment addresses + ABIs used by every package (`npm run sync`) |
 | [`api/`](api/) | Paywalled x402-style API settled through the vault. See [api/README.md](api/README.md). |
-| [`agent/`](agent/) | AI agent (step 3) |
+| [`agent/`](agent/) | AI agent that buys data from the API and can only pay through the vault (LLM or scripted, plus a prompt-injection simulation). CLI and SSE server. See [agent/README.md](agent/README.md). |
 | [`web/`](web/) | Next.js dashboard (step 4) |
 
 ## How to run
@@ -43,4 +43,12 @@ npm run api
 npm run demo:weather -w @leash/api   # paid via vault, 200
 npm run demo:attack  -w @leash/api   # blocked onchain: LOW_REPUTATION
 npm run demo:report  -w @leash/api   # pending, needs owner approval
+
+# Agent (needs the API running)
+cp agent/.env.example agent/.env # set AGENT_PRIVATE_KEY, optionally an LLM
+npm run agent -- weather                  # buys weather through the vault (LLM, or scripted without one)
+npm run agent -- report                   # 8 mUSDC: waits for owner approval, then fetches
+npm run agent -- injection-llm            # LLM reads a prompt-injected response
+npm run agent -- injection-compromised    # SIMULATION: hijacked agent, every payment blocked onchain
+npm run agent:server                      # http://localhost:4022 for the dashboard (POST /run, GET /events)
 ```
