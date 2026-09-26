@@ -93,9 +93,12 @@ function Wallet() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={`Wallet ${address}`}
         className="inline-flex h-9 items-center gap-2 rounded-xl border border-line bg-white/[0.04] px-3 font-mono text-sm transition hover:border-white/15"
       >
-        <span className="size-2 rounded-full bg-safe" />
+        <span className="size-2 rounded-full bg-safe" aria-hidden />
         {shortAddr(address)}
       </button>
       {open && (

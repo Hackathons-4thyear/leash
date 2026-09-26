@@ -8,8 +8,9 @@
   --color-panel: #0a0f0d;
   --color-line: rgb(255 255 255 / 0.07);
   --color-fg: #e8efeb;
-  --color-muted: #8a9690;
-  --color-faint: #56615b;
+  /* muted and faint both clear WCAG AA (4.5:1) on the ink background and on cards. */
+  --color-muted: #a1ada7;
+  --color-faint: #7a8680;
 
   --color-safe: #2bff88;
   --color-safe-dim: #15a85a;
@@ -89,6 +90,13 @@ body::before {
 
 ::selection {
   background: rgb(43 255 136 / 0.3);
+}
+
+/* Keyboard focus: a visible ring on every interactive element, never on mouse clicks. */
+:where(a, button, [role="switch"], [tabindex]):focus-visible {
+  outline: 2px solid var(--color-safe);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
 }
 
 .card {

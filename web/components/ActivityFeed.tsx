@@ -45,6 +45,7 @@ export function ActivityFeed() {
           <button
             key={f}
             type="button"
+            aria-pressed={filter === f}
             onClick={() => setFilter(f)}
             className={cx(
               "flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium capitalize transition",
