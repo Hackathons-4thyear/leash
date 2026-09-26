@@ -32,7 +32,7 @@ export const PROOF: ProofTx[] = [
   },
   {
     title: "Hijacked agent",
-    detail: "4 USDC \"fee\" to an address with reputation 12/100",
+    detail: "4 USDC \"verification fee\" to an address with reputation 12/100",
     verdict: "BLOCKED",
     reason: "LOW_REPUTATION",
     tx: "0x92bc6f6ccd1dff10e7d3edcb0692c778585a4b7d391d4a8337870dca8f21bfc4",
