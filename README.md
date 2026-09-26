@@ -16,16 +16,31 @@ The contract does the checking, so even a prompt-injected agent can't overspend 
 | Folder | What's in it |
 |---|---|
 | [`contracts/`](contracts/) | Foundry project: `LeashVault`, `MockUSDC`, `MockReputationOracle`, tests, deploy script. See [contracts/README.md](contracts/README.md). |
-| [`api/`](api/) | Paywalled x402-style API (step 2) |
+| [`shared/`](shared/) | Generated deployment addresses + ABIs used by every package (`npm run sync`) |
+| [`api/`](api/) | Paywalled x402-style API settled through the vault. See [api/README.md](api/README.md). |
 | [`agent/`](agent/) | AI agent (step 3) |
 | [`web/`](web/) | Next.js dashboard (step 4) |
 
-## Quick start
+## How to run
+
+Target network: Base Sepolia (chain id 84532). The contracts are already deployed. Their addresses are in [shared/deployments/base-sepolia.json](shared/deployments/base-sepolia.json).
 
 ```bash
 git clone --recursive <repo-url>
-cd contracts
-forge test -vv
-```
+npm install                      # installs every workspace (Node 20+)
 
-Target network: Base Sepolia (chain id 84532).
+# Contracts (optional, already deployed)
+cd contracts && forge test -vv && cd ..
+
+# After a redeploy: regenerate shared/ from contracts/out + broadcast
+npm run sync
+
+# API on http://localhost:4021
+cp api/.env.example api/.env     # set AGENT_PRIVATE_KEY
+npm run api
+
+# In a second terminal: end-to-end payments against the live vault
+npm run demo:weather -w @leash/api   # paid via vault, 200
+npm run demo:attack  -w @leash/api   # blocked onchain: LOW_REPUTATION
+npm run demo:report  -w @leash/api   # pending, needs owner approval
+```

@@ -1,0 +1,17 @@
+{
+  "name": "leash",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "api",
+    "agent",
+    "web"
+  ],
+  "scripts": {
+    "sync": "node shared/scripts/sync.mjs",
+    "api": "npm run dev -w @leash/api"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@leash/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "sync": "node scripts/sync.mjs"
+  },
+  "devDependencies": {
+    "viem": "^2.21.0"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "network": "base-sepolia",
+  "chainId": 84532,
+  "rpcUrl": "https://sepolia.base.org",
+  "explorerUrl": "https://sepolia.basescan.org",
+  "deployBlock": 47320439,
+  "usdcDecimals": 6,
+  "addresses": {
+    "vault": "0x5AF106057d35c9771C94e0E1369f1A057cd581E9",
+    "usdc": "0x57D03EE3DBe184CCb8E3112Ccb287F6970230c88",
+    "oracle": "0x36571e0600FBc340FeB2568307015f5A418E9e9A",
+    "agent": "0xE3A74291431EcFddeD3aE396b403994345C96A8C",
+    "legitApi": "0x6ABd7098Bf653B93a11ADc662ADd5e690F1b1CDb",
+    "attacker": "0xacC9489657E240dB746E6cb0ce717Ef13f9BA1eb"
+  }
+}

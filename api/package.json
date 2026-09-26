@@ -1,0 +1,30 @@
+{
+  "name": "@leash/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "pay": "tsx scripts/pay-and-fetch.ts",
+    "demo:weather": "tsx scripts/pay-and-fetch.ts /weather?city=Lisbon",
+    "demo:attack": "tsx scripts/pay-and-fetch.ts /sketchy/premium",
+    "demo:report": "tsx scripts/pay-and-fetch.ts /market-report?topic=stablecoins"
+  },
+  "dependencies": {
+    "@leash/shared": "*",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^5.1.0",
+    "picocolors": "^1.1.1",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.14.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
