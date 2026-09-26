@@ -19,6 +19,7 @@ cp agent/.env.example agent/.env
 | `RPC_URL` | | Defaults to `https://sepolia.base.org`. |
 | `API_URL` | | Defaults to `http://localhost:4021`. |
 | `PORT` | server | Defaults to `4022`. |
+| `WEB_ORIGIN` | server | Dashboard origins allowed by CORS, comma-separated. Defaults to `http://localhost:3000`. |
 
 The API must be running (`npm run api`), and the agent address needs a little Base Sepolia ETH for gas.
 
@@ -67,7 +68,7 @@ Paths are restricted to the configured API. The system prompt is in [`src/modes/
 ## Server (for the dashboard)
 
 ```bash
-npm run agent:server     # http://localhost:4022, CORS for http://localhost:3000
+npm run agent:server     # http://localhost:4022, CORS for WEB_ORIGIN (default http://localhost:3000)
 ```
 
 | Endpoint | |
