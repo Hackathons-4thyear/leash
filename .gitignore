@@ -1,19 +1,22 @@
 # Dependencies
 node_modules/
 
-# Secrets
+# Secrets: every .env file in any package, except the committed templates
 .env
-.env.local
-.env.*.local
+.env.*
 !.env.example
 
 # Foundry build output
 out/
 cache/
 
-# Foundry broadcast logs (contain deploy tx data; kept out for now)
+# Foundry broadcast logs of real runs (deploy tx data, never committed)
 broadcast/
-broadcast/*/84532/run-latest.json
+
+# Tooling
+.vercel
+*.log
+*.tsbuildinfo
 
 # OS
 .DS_Store
