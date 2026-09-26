@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { addressUrl, labelOf, txUrl } from "@/lib/config";
 import { shortAddr, shortHash } from "@/lib/format";
 import { IconCheck, IconCopy, IconExternal } from "./icons";
@@ -79,6 +79,7 @@ export function TxLink({ hash, className }: { hash: string; className?: string }
       rel="noreferrer"
       className={cx("inline-flex items-center gap-1 font-mono text-[11px] text-faint transition hover:text-fg", className)}
       title={hash}
+      aria-label={`Transaction ${shortHash(hash)} on BaseScan`}
     >
       {shortHash(hash)}
       <IconExternal width={11} height={11} />
@@ -113,16 +114,18 @@ export function Skeleton({ className }: { className?: string }) {
 }
 
 export function Logo({ size = 28 }: { size?: number }) {
+  // Unique per instance: the logo appears in both the header and the footer.
+  const g = `leash-g${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden>
       <defs>
-        <linearGradient id="leash-g" x1="4" y1="2" x2="28" y2="30" gradientUnits="userSpaceOnUse">
+        <linearGradient id={g} x1="4" y1="2" x2="28" y2="30" gradientUnits="userSpaceOnUse">
           <stop stopColor="#2bff88" />
           <stop offset="1" stopColor="#0f8a4a" />
         </linearGradient>
       </defs>
       {/* Shield */}
-      <path d="M16 2.5 5 6.8v8.1c0 6.7 4.6 12 11 14.6 6.4-2.6 11-7.9 11-14.6V6.8L16 2.5z" fill="url(#leash-g)" fillOpacity="0.14" stroke="url(#leash-g)" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M16 2.5 5 6.8v8.1c0 6.7 4.6 12 11 14.6 6.4-2.6 11-7.9 11-14.6V6.8L16 2.5z" fill={`url(#${g})`} fillOpacity="0.14" stroke={`url(#${g})`} strokeWidth="1.6" strokeLinejoin="round" />
       {/* Leash: a loop handle with a line down to a clasp ring */}
       <path d="M16 8.2a3.2 3.2 0 1 1 0 6.4 3.2 3.2 0 0 1 0-6.4z" stroke="#2bff88" strokeWidth="1.8" />
       <path d="M16 14.6c0 2.2-2.6 2.9-2.6 5.2 0 1.6 1.2 2.6 2.6 2.6" stroke="#2bff88" strokeWidth="1.8" strokeLinecap="round" />

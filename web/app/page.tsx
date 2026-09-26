@@ -1,11 +1,14 @@
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { AgentConsole } from "@/components/AgentConsole";
 import { BlockedAlerts } from "@/components/BlockedAlerts";
+import { ChainError } from "@/components/ChainError";
+import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { KillSwitch } from "@/components/KillSwitch";
 import { PendingApprovals } from "@/components/PendingApprovals";
 import { PolicyPanel } from "@/components/PolicyPanel";
+import { ProofStrip } from "@/components/ProofStrip";
 import { Stats } from "@/components/Stats";
 
 export default function Page() {
@@ -15,6 +18,8 @@ export default function Page() {
       <BlockedAlerts />
       <main className="relative z-10 mx-auto max-w-[1400px] space-y-5 px-4 pb-16 pt-8 sm:px-6">
         <Hero />
+        <ProofStrip />
+        <ChainError />
         <Stats />
 
         <div className="grid gap-5 lg:grid-cols-12">
@@ -36,10 +41,7 @@ export default function Page() {
           </div>
         </div>
 
-        <footer className="flex flex-wrap items-center justify-between gap-2 pt-4 text-xs text-faint">
-          <span>Leash · every number on this page is read live from Base Sepolia.</span>
-          <span className="font-mono">testnet · mUSDC</span>
-        </footer>
+        <Footer />
       </main>
     </>
   );
