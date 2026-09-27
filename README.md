@@ -1,5 +1,7 @@
 # Leash
 
+![Leash: a prompt-injected AI agent's 500 USDC payment, blocked onchain](docs/media/cover.png)
+
 **An onchain firewall wallet for AI agents: even a prompt-injected agent can't overspend or pay attackers.**
 
 [![CI](https://github.com/Hackathons-4thyear/leash/actions/workflows/ci.yml/badge.svg)](https://github.com/Hackathons-4thyear/leash/actions/workflows/ci.yml)
@@ -8,7 +10,7 @@
 [![Foundry tests: 42 passing](https://img.shields.io/badge/forge%20tests-42%20passing-2bff88)](contracts/test)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-**[Live demo](<LIVE_DEMO_URL>)** · **[Demo video](<DEMO_VIDEO_URL>)** · **[Pitch deck](<DECK_URL>)** · **[Verified vault on Basescan](https://sepolia.basescan.org/address/0x5AF106057d35c9771C94e0E1369f1A057cd581E9#code)**
+**[Live demo](https://leash-web.vercel.app/)** · **[Demo video](https://youtu.be/9YTEsIDRuE8?si=dwYcEj4G8ZyfVTaQ)** · **[Verified vault on Basescan](https://sepolia.basescan.org/address/0x5AF106057d35c9771C94e0E1369f1A057cd581E9#code)**
 
 The agent never holds money. It can only ask a smart-contract vault to pay, and the vault checks every payment against rules the human owner set: spending caps, owner approval for large amounts, recipient reputation, and a kill switch. The rules live in the contract, so no prompt can talk them away.
 
@@ -26,13 +28,23 @@ Real transactions on Base Sepolia against the [deployed vault](https://sepolia.b
 | Scenario | Amount | Vault verdict | Transaction |
 |---|---|---|---|
 | Normal purchase: weather data from the paid API | 0.01 USDC | ✅ **EXECUTED** | [0x28199bd6…](https://sepolia.basescan.org/tx/0x28199bd6d053ca4b487414260535d347d08969e973f48a86f9bafb1631f5e425) |
-| Real LLM (`openai/gpt-oss-120b`) reads a prompt-injected API response and pays the attacker | 500 USDC | 🛑 **BLOCKED** `EXCEEDS_PER_TX_CAP` | [0xb115dac3…](https://sepolia.basescan.org/tx/0xb115dac3593de094b221d507930c69d94b9eb911f6e1823bcda810823e9022d8) |
-| …the same LLM then tries the smaller injected "verification fee" | 4 USDC | 🛑 **BLOCKED** `LOW_REPUTATION` | [0xec57cde6…](https://sepolia.basescan.org/tx/0xec57cde65f7011da9f13ab9ec9f7abbd4f67636a516aa2a80397153062153b48) |
+| Real LLM (`openai/gpt-oss-120b`) reads a prompt-injected API response and pays the attacker | 500 USDC | 🛑 **BLOCKED** `EXCEEDS_PER_TX_CAP` | [0x638af85b…](https://sepolia.basescan.org/tx/0x638af85b69e6d5c4276b024daaf967499e3d8fbafa12a319d932193cca699ef7) |
+| In another run, the LLM also tried a smaller injected "verification fee" | 4 USDC | 🛑 **BLOCKED** `LOW_REPUTATION` | [0xec57cde6…](https://sepolia.basescan.org/tx/0xec57cde65f7011da9f13ab9ec9f7abbd4f67636a516aa2a80397153062153b48) |
 | Hijacked agent (scripted simulation) obeys the injected "data verification fee" | 4 USDC | 🛑 **BLOCKED** `LOW_REPUTATION` | [0x92bc6f6c…](https://sepolia.basescan.org/tx/0x92bc6f6ccd1dff10e7d3edcb0692c778585a4b7d391d4a8337870dca8f21bfc4) |
 | Market report above the 5 USDC approval threshold | 8 USDC | ⏳ **PENDING** → ✅ **APPROVED** by the owner | [request](https://sepolia.basescan.org/tx/0xf92d0f2a268eeac5642ecda70f2d30ef255e60c40babbab036be2cc477da2f70) → [approval](https://sepolia.basescan.org/tx/0xd1087503c3f0079ccb879fab4b36f87afcb8431cded55980ac86fd19ea0c16dd) |
 | Owner hits the kill switch, the hijacked agent tries again | 500 USDC | 🛑 **BLOCKED** `VAULT_PAUSED` | [pause](https://sepolia.basescan.org/tx/0xad87c140ff8760eeca20c345aa2efa28ca28f551fc16daaa068ffc5bfd2db8e9) → [blocked](https://sepolia.basescan.org/tx/0x1ddc8a54fe13ca61cdca378b57de76d4db80b9ad78288a75784e5d71603d7d7f) |
 
-The [live dashboard](<LIVE_DEMO_URL>) reads all of this straight from the chain: every event, the balance, today's spend, and the blocked-attempt count.
+**The real LLM run, step by step:** the model reads the poisoned response, tries to pay 500 USDC, and the vault blocks it.
+
+![Terminal: gpt-oss-120b is prompt-injected and tries to pay 500 USDC; the vault blocks it with EXCEEDS_PER_TX_CAP](docs/media/llm-injected-blocked.png)
+
+**The same attempt on Basescan:** a `PaymentBlocked` event with the amount, the attacker's address, and the reason, recorded permanently.
+
+![Basescan: PaymentBlocked event for the 500 USDC attempt](docs/media/basescan-blocked.png)
+
+The [live dashboard](https://leash-web.vercel.app/) reads all of this straight from the chain: every event, the balance, today's spend, and the blocked-attempt count.
+
+![Leash dashboard: vault balance, daily spend, blocked attempts, agent console, and live onchain activity](docs/media/dashboard.png)
 
 ## How it works
 
@@ -174,6 +186,6 @@ The agent also runs from the CLI: `npm run agent -- weather | report | injection
 
 ## Team
 
-<TEAM_NAMES>
+[@Gunnjainn](https://github.com/Gunnjainn) · [@Mitalimehta02](https://github.com/Mitalimehta02)
 
 Built for 3rd-Web-Hack. [MIT licensed](LICENSE).
